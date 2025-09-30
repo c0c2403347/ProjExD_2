@@ -44,16 +44,8 @@ def game_over(screen: pg.Surface) -> None:
     cry_img = pg.transform.rotozoom(pg.image.load("fig/5.png"), 0, 0.9)
     cry_img2 = pg.transform.rotozoom(pg.image.load("fig/5.png"), 0, 0.9)
 
-    padding = 20  # テキストとこうかとんの間の隙間
-    # 左側こうかとん
+    padding = 20  
     cry_rct = cry_img.get_rect()
-    # 右側こうかとん
-    cry_rct2 = cry_img2.get_rect()
-
-    padding = 20  # テキストとこうかとんの間の隙間
-    # 左側こうかとん
-    cry_rct = cry_img.get_rect()
-    # 右側こうかとん
     cry_rct2 = cry_img2.get_rect()
 
     # テキストの左端・右端を取得
@@ -79,9 +71,22 @@ def game_over(screen: pg.Surface) -> None:
     pg.display.update()
     time.sleep(5)
 
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+
+    bb_imgs = []
+    bb_accs = []
+    for r in range(1, 11):
+        bb_img = pg.Surface((20 * r, 20 * r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10 * r, 10 * r), 10 * r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
+        bb_accs.append(r)
+    return bb_imgs, bb_accs
 
 
 def main():
+
+    bb_imgs, bb_accs = init_bb_imgs()
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
@@ -108,7 +113,7 @@ def main():
             game_over(screen)
 
             return  # ゲームオーバー
-
+        
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
         for key, mv in DELTA.items():
@@ -129,7 +134,13 @@ def main():
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx, vy)  # 爆弾移動
+
+        idx = min(tmr // 500, 9)  # 段階的に選択
+        bb_img =   bb_imgs[idx]
+        avx = vx * bb_accs[idx]
+        avy = vy * bb_accs[idx]
+        bb_rct.move_ip(avx, avy)
+
         yoko, tate = check_bound(bb_rct)
         if not yoko:  # 横方向にはみ出ていたら
             vx *= -1
