@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
 
 
@@ -27,6 +28,58 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
         tate = False
     return yoko, tate
 
+def game_over(screen: pg.Surface) -> None:
+   
+    # 黒いSurfaceを半透明で作成
+    over_sfc = pg.Surface((WIDTH, HEIGHT))
+    over_sfc.fill((0, 0, 0))
+    over_sfc.set_alpha(200)
+
+    # 「Game Over」テキスト
+    font = pg.font.Font(None, 100)
+    text_sfc = font.render("Game Over", True, (255, 255, 255))
+    text_rct = text_sfc.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100))
+
+    # 泣いているこうかとん画像（5.pngなど）
+    cry_img = pg.transform.rotozoom(pg.image.load("fig/5.png"), 0, 0.9)
+    cry_img2 = pg.transform.rotozoom(pg.image.load("fig/5.png"), 0, 0.9)
+
+    padding = 20  # テキストとこうかとんの間の隙間
+    # 左側こうかとん
+    cry_rct = cry_img.get_rect()
+    # 右側こうかとん
+    cry_rct2 = cry_img2.get_rect()
+
+    padding = 20  # テキストとこうかとんの間の隙間
+    # 左側こうかとん
+    cry_rct = cry_img.get_rect()
+    # 右側こうかとん
+    cry_rct2 = cry_img2.get_rect()
+
+    # テキストの左端・右端を取得
+    text_left = text_rct.left
+    text_right = text_rct.right
+    text_center_y = text_rct.centery
+
+    # 左こうかとんをテキストの左側に配置
+    cry_rct.right = text_left - padding
+    cry_rct.centery = text_center_y
+    # 右こうかとんをテキストの右側に配置
+    cry_rct2.left = text_right + padding
+    cry_rct2.centery = text_center_y
+
+
+
+    # 描画
+    screen.blit(over_sfc, (0, 0))
+    screen.blit(text_sfc, text_rct)
+    screen.blit(cry_img, cry_rct)
+    screen.blit(cry_img, cry_rct2)
+    
+    pg.display.update()
+    time.sleep(5)
+
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -48,8 +101,12 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+    
         screen.blit(bg_img, [0, 0]) 
         if kk_rct.colliderect(bb_rct):  # こうかとんと爆弾の衝突判定
+
+            game_over(screen)
+
             return  # ゲームオーバー
 
         key_lst = pg.key.get_pressed()
