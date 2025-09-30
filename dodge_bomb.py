@@ -86,24 +86,23 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
 
 def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
     base_img = pg.image.load("fig/3.png")
-    scale_factor = 0.9 
-    flipped_img = pg.transform.flip(base_img, True, False)  
+    scale_factor = 0.9 #スケーリング係数
+    #反転した画像の作成
+    flipped_img = pg.transform.flip(base_img, True, False)  # 水平方向に反転
 
     kk_dict = {
-        (0, 0): base_img,              
-        (+5, 0): flipped_img,           
-        (+5, -5): pg.transform.rotozoom(flipped_img, 45, scale_factor),  
-        (0, -5): pg.transform.rotozoom(base_img, -90, scale_factor),   
-        (-5, -5): pg.transform.rotozoom(base_img, -45, scale_factor), 
-        (-5, 0): base_img,              
-        (-5, +5): pg.transform.rotozoom(base_img, 45, scale_factor),  
-        (0, +5): pg.transform.rotozoom(base_img, 90, scale_factor),    
-        (+5, +5): pg.transform.rotozoom(flipped_img, -45, scale_factor),   
+        (0, 0): base_img,      # キー押下なし         
+        (+5, 0): flipped_img,  #右    
+        (+5, -5): pg.transform.rotozoom(flipped_img, 45, scale_factor), #右上 
+        (0, -5): pg.transform.rotozoom(base_img, -90, scale_factor),   #上
+        (-5, -5): pg.transform.rotozoom(base_img, -45, scale_factor),  #左上
+        (-5, 0): base_img,     #左         
+        (-5, +5): pg.transform.rotozoom(base_img, 45, scale_factor),  #左下
+        (0, +5): pg.transform.rotozoom(base_img, 90, scale_factor),   #下 
+        (+5, +5): pg.transform.rotozoom(flipped_img, -45, scale_factor),   #右下
     }
 
     return kk_dict
-
-
 
 
 def main():
