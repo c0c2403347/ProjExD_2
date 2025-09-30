@@ -84,12 +84,37 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     return bb_imgs, bb_accs
 
 
-def main():
+def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
+    base_img = pg.image.load("fig/3.png")
+    scale_factor = 0.9 
+    flipped_img = pg.transform.flip(base_img, True, False)  
 
+    kk_dict = {
+        (0, 0): base_img,              
+        (+5, 0): flipped_img,           
+        (+5, -5): pg.transform.rotozoom(flipped_img, 45, scale_factor),  
+        (0, -5): pg.transform.rotozoom(base_img, -90, scale_factor),   
+        (-5, -5): pg.transform.rotozoom(base_img, -45, scale_factor), 
+        (-5, 0): base_img,              
+        (-5, +5): pg.transform.rotozoom(base_img, 45, scale_factor),  
+        (0, +5): pg.transform.rotozoom(base_img, 90, scale_factor),    
+        (+5, +5): pg.transform.rotozoom(flipped_img, -45, scale_factor),   
+    }
+
+    return kk_dict
+
+
+
+
+def main():
+    kk_imgs = get_kk_imgs()
+    
     bb_imgs, bb_accs = init_bb_imgs()
+
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
+
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
@@ -133,6 +158,10 @@ def main():
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
+
+        kk_img = kk_imgs.get(tuple(sum_mv), kk_imgs[(0, 0)])
+        screen.blit(kk_img, kk_rct)
+
         screen.blit(kk_img, kk_rct)
 
         idx = min(tmr // 500, 9)  # 段階的に選択
